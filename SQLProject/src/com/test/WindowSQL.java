@@ -22,6 +22,9 @@ import javax.swing.JTextField;
 import javax.swing.JTable;
 import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
+
+import net.proteanit.sql.DbUtils;
+
 import javax.swing.JTabbedPane;
 import java.awt.TextField;
 import javax.swing.JScrollPane;
@@ -92,9 +95,30 @@ public class WindowSQL {
 			@Override
 			public void windowOpened(WindowEvent e) {
 				
-		        String connectionUrl = "jdbc:sqlserver://localhost:1433;databaseName=AdventureWorks2016;integratedSecurity=true;";
+				
+				// populate table on form load
+				// START
+				String connectionUrl = "jdbc:sqlserver://localhost:1433;databaseName=AdventureWorks2016;integratedSecurity=true;";
 
 		        try (Connection con = DriverManager.getConnection(connectionUrl); Statement stmt = con.createStatement();) {
+		            String SQL = "SELECT TOP 10 * FROM Person.Person AS p ORDER BY p.LastName DESC";
+		            ResultSet rs = stmt.executeQuery(SQL);
+		            
+		            sqlTable.setModel(DbUtils.resultSetToTableModel(rs));
+
+//		            while (rs.next()) {
+//		                System.out.println(rs.getString("FirstName") + " " + rs.getString("LastName"));
+//		            }
+		        }
+		        catch (SQLException ex) {
+		            ex.printStackTrace();
+		        }
+		        // END
+				
+				
+		        String connectionUrl1 = "jdbc:sqlserver://localhost:1433;databaseName=AdventureWorks2016;integratedSecurity=true;";
+
+		        try (Connection con = DriverManager.getConnection(connectionUrl1); Statement stmt = con.createStatement();) {
 		            String SQL = "SELECT TOP 10 * FROM Person.Person AS p ORDER BY p.LastName DESC";
 		            ResultSet rs = stmt.executeQuery(SQL);
 
@@ -213,6 +237,27 @@ public class WindowSQL {
 		containerJScrollPane.setViewportView(sqlTable);
 		
 		JButton dbButtonTable = new JButton("Db Records To Table");
+		dbButtonTable.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+				String connectionUrl = "jdbc:sqlserver://localhost:1433;databaseName=AdventureWorks2016;integratedSecurity=true;";
+
+		        try (Connection con = DriverManager.getConnection(connectionUrl); Statement stmt = con.createStatement();) {
+		            String SQL = "SELECT TOP 10 * FROM Person.Person AS p ORDER BY p.LastName DESC";
+		            ResultSet rs = stmt.executeQuery(SQL);
+		            
+		            sqlTable.setModel(DbUtils.resultSetToTableModel(rs));
+
+//		            while (rs.next()) {
+//		                System.out.println(rs.getString("FirstName") + " " + rs.getString("LastName"));
+//		            }
+		        }
+		        catch (SQLException ex) {
+		            ex.printStackTrace();
+		        }
+				
+			}
+		});
 		//dbButtonTable.addActionListener(new ActionListener() {
 			
 			// return values stored procedure to JTable
@@ -239,7 +284,7 @@ public class WindowSQL {
 //		        }
 //		        
 //			}
-			// END 4.0.1
+			// END 4.0
 
 //		});
 		dbButtonTable.setBounds(293, 239, 167, 30);
